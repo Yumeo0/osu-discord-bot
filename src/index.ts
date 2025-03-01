@@ -252,32 +252,32 @@ function createManiaScoreEmbed(score: OsuScore) {
       },
       {
         name: "Perfect",
-        value: score.statistics.perfect?.toString() ?? "Undefined",
+        value: score.statistics.perfect?.toString() ?? "0",
         inline: true,
       },
       {
         name: "Good",
-        value: score.statistics.good?.toString() ?? "Undefined",
+        value: score.statistics.good?.toString() ?? "0",
         inline: true,
       },
       {
         name: "Meh",
-        value: score.statistics.meh?.toString() ?? "Undefined",
+        value: score.statistics.meh?.toString() ?? "0",
         inline: true,
       },
       {
         name: "Great",
-        value: score.statistics.great?.toString() ?? "Undefined",
+        value: score.statistics.great?.toString() ?? "0",
         inline: true,
       },
       {
         name: "Ok",
-        value: score.statistics.ok?.toString() ?? "Undefined",
+        value: score.statistics.ok?.toString() ?? "0",
         inline: true,
       },
       {
         name: "Miss",
-        value: score.statistics.miss?.toString() ?? "Undefined",
+        value: score.statistics.miss?.toString() ?? "0",
         inline: true,
       }
     )
