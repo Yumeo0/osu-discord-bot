@@ -178,7 +178,7 @@ function createGenericScoreEmbed(score: OsuScore) {
       `https://osu.ppy.sh/beatmapsets/${score.beatmapset.id}#${score.beatmap.mode}/${score.beatmap.id}`
     )
     .setDescription(
-      `Mods: \`${score.mods.length > 0 ? score.mods.join(", ") : "No Mods"}\``
+      `Mods: \`${score.mods.length > 0 ? score.mods.map(mod => mod.acronym).join(", ") : "No Mods"}\``
     )
     .addFields(
       {
