@@ -183,7 +183,7 @@ function createGenericScoreEmbed(score: OsuScore) {
     .addFields(
       {
         name: "Score",
-        value: `\`${score.total_score}\``,
+        value: `\`${score.total_score == 0 ? score.legacy_total_score : score.total_score}\``,
         inline: true,
       },
       {
@@ -227,12 +227,12 @@ function createManiaScoreEmbed(score: OsuScore) {
       `https://osu.ppy.sh/beatmapsets/${score.beatmapset.id}#${score.beatmap.mode}/${score.beatmap.id}`
     )
     .setDescription(
-      `Mods: \`${score.mods.length > 0 ? score.mods.join(", ") : "No Mods"}\``
+      `Mods: \`${score.mods.length > 0 ? score.mods.map(mod => mod.acronym).join(", ") : "No Mods"}\``
     )
     .addFields(
       {
         name: "Score",
-        value: `\`${score.total_score}\``,
+        value: `\`${score.total_score == 0 ? score.legacy_total_score : score.total_score}\``,
         inline: true,
       },
       {
