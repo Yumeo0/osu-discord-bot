@@ -122,7 +122,7 @@ client.on(Events.ClientReady, (readyClient) => {
               scoreId: score.id,
               gamemode: score.beatmap.mode,
             });
-            const embed = createScoreEmbed(score as OsuScore);
+            const embed = createScoreEmbed(fixScore(score as OsuScore));
             await channel.send({
               embeds: [embed],
             });
@@ -152,7 +152,46 @@ interface OsuScoreStatistics extends osu.Score.Statistics {
   perfect: number | undefined;
 }
 
-function createScoreEmbed(score: OsuScore) {
+interface OsuScoreFixedStatistics extends osu.Score.Statistics {
+  miss: number;
+  meh: number;
+  ok: number;
+  good: number;
+  perfect: number;
+  great: number;
+}
+
+interface OsuScoreFixed extends OsuScore {
+  statistics: OsuScoreFixedStatistics
+}
+
+function fixScore(score: OsuScore): OsuScoreFixed {
+  return {
+    ...score,
+    statistics: {
+      miss: score.statistics.miss ?? 0,
+      meh: score.statistics.meh ?? 0,
+      ok: score.statistics.ok ?? 0,
+      good: score.statistics.good ?? 0,
+      perfect: score.statistics.perfect ?? 0,
+      great: score.statistics.great ?? 0,
+    }
+  };
+}
+
+function calculateAccuracy(score: OsuScoreFixed) {
+  if (score.accuracy !== 0) return score.accuracy;
+
+  if (score.beatmap.mode.includes("mania")) {
+    const total_hits = score.statistics.perfect + score.statistics.good + score.statistics.meh + score.statistics.great + score.statistics.ok + score.statistics.miss;
+    return ((50 * score.statistics.meh) + (100 * score.statistics.ok) + (200 * score.statistics.good) + (300 * score.statistics.great) + (300 * score.statistics.perfect)) / (total_hits * 300);
+  } else {
+    const total_hits =  score.statistics.meh + score.statistics.great + score.statistics.ok + score.statistics.miss;
+    return ((score.statistics.great * 300) + (score.statistics.ok * 100) + (score.statistics.meh * 50)) / (total_hits * 300);
+  }
+}
+
+function createScoreEmbed(score: OsuScoreFixed) {
   if (score.beatmap.mode.includes("mania")) {
     return createManiaScoreEmbed(score);
   } else {
@@ -160,7 +199,7 @@ function createScoreEmbed(score: OsuScore) {
   }
 }
 
-function createGenericScoreEmbed(score: OsuScore) {
+function createGenericScoreEmbed(score: OsuScoreFixed) {
   return new EmbedBuilder()
     .setAuthor({
       name: score.user.username,
@@ -188,7 +227,7 @@ function createGenericScoreEmbed(score: OsuScore) {
       },
       {
         name: "Accuracy",
-        value: `\`${(score.accuracy * 100).toFixed(2)}%\``,
+        value: `\`${(calculateAccuracy(score) * 100).toFixed(2)}%\``,
         inline: true,
       },
       {
@@ -209,7 +248,7 @@ function createGenericScoreEmbed(score: OsuScore) {
     .setTimestamp(new Date(score.ended_at));
 }
 
-function createManiaScoreEmbed(score: OsuScore) {
+function createManiaScoreEmbed(score: OsuScoreFixed) {
   return new EmbedBuilder()
     .setAuthor({
       name: score.user.username,
@@ -237,7 +276,7 @@ function createManiaScoreEmbed(score: OsuScore) {
       },
       {
         name: "Accuracy",
-        value: `\`${(score.accuracy * 100).toFixed(2)}%\``,
+        value: `\`${(calculateAccuracy(score) * 100).toFixed(2)}%\``,
         inline: true,
       },
       {
@@ -252,32 +291,32 @@ function createManiaScoreEmbed(score: OsuScore) {
       },
       {
         name: "Perfect",
-        value: score.statistics.perfect?.toString() ?? "0",
+        value: score.statistics.perfect.toString(),
         inline: true,
       },
       {
         name: "Good",
-        value: score.statistics.good?.toString() ?? "0",
+        value: score.statistics.good.toString(),
         inline: true,
       },
       {
         name: "Meh",
-        value: score.statistics.meh?.toString() ?? "0",
+        value: score.statistics.meh.toString(),
         inline: true,
       },
       {
         name: "Great",
-        value: score.statistics.great?.toString() ?? "0",
+        value: score.statistics.great.toString(),
         inline: true,
       },
       {
         name: "Ok",
-        value: score.statistics.ok?.toString() ?? "0",
+        value: score.statistics.ok.toString(),
         inline: true,
       },
       {
         name: "Miss",
-        value: score.statistics.miss?.toString() ?? "0",
+        value: score.statistics.miss.toString(),
         inline: true,
       }
     )
